@@ -42,8 +42,13 @@ entity vga_ctrl is
            VGA_RED_O : out STD_LOGIC_VECTOR (3 downto 0);
            VGA_BLUE_O : out STD_LOGIC_VECTOR (3 downto 0);
            VGA_GREEN_O : out STD_LOGIC_VECTOR (3 downto 0);
-           PS2_CLK      : inout STD_LOGIC;
-           PS2_DATA     : inout STD_LOGIC
+
+           VGA_RED_I   : in STD_LOGIC_VECTOR (3 downto 0);
+           VGA_GREEN_I : in STD_LOGIC_VECTOR (3 downto 0);
+           VGA_BLUE_I  : in STD_LOGIC_VECTOR (3 downto 0);
+           
+           H_CNT_O     : out STD_LOGIC_VECTOR (11 downto 0);
+           V_CNT_O     : out STD_LOGIC_VECTOR (11 downto 0)
            );
 end vga_ctrl;
 
@@ -206,27 +211,6 @@ begin
          active <= '1' when h_cntr_reg_dly < FRAME_WIDTH and v_cntr_reg_dly < FRAME_HEIGHT
                    else '0';
        
-       
-     ---------------------------------------
-     
-     -- Generate moving colorbar background
-     
-     ---------------------------------------
-     
-     process(pxl_clk)
-     begin
-         if(rising_edge(pxl_clk)) then
-             cntdyn <= cntdyn + 1;
-         end if;
-     end process;
-    
-     intHcnt <= conv_integer(h_cntr_reg);
-     intVcnt <= conv_integer(v_cntr_reg);
-     
-     bg_red <= "0001";--conv_std_logic_vector((-intvcnt - inthcnt - cntDyn/2**20),8)(7 downto 4);
-     bg_green <= conv_std_logic_vector((inthcnt - cntDyn/2**20),8)(7 downto 4);
-     bg_blue <= conv_std_logic_vector((intvcnt - cntDyn/2**20),8)(7 downto 4);
-     
      
     ---------------------------------------------------------------------------------------------------
     
@@ -237,9 +221,9 @@ begin
       begin
         if (rising_edge(pxl_clk)) then
       
-            bg_red_dly            <= bg_red;
-            bg_green_dly        <= bg_green;
-            bg_blue_dly            <= bg_blue;
+            bg_red_dly             <= VGA_RED_I;
+            bg_green_dly           <= VGA_GREEN_I;
+            bg_blue_dly            <= VGA_BLUE_I; 
             
             h_cntr_reg_dly <= h_cntr_reg;
             v_cntr_reg_dly <= v_cntr_reg;
@@ -263,9 +247,9 @@ begin
     ------------------------------------------------------------
     
     --          active <= '1' when h_cntr_reg_dly < FRAME_WIDTH and v_cntr_reg_dly < FRAME_HEIGHT
-    vga_red_cmb <= (active & active & active & active) and vga_red when h_cntr_reg_dly < 512 else "0000";
-    vga_green_cmb <= (active & active & active & active) and vga_green when h_cntr_reg_dly < 512 else "0000";
-    vga_blue_cmb <= (active & active & active & active) and vga_blue when h_cntr_reg_dly < 512 else "0000";
+    vga_red_cmb <=   (active & active & active & active) and vga_red;
+    vga_green_cmb <= (active & active & active & active) and vga_green;
+    vga_blue_cmb <=  (active & active & active & active) and vga_blue;
     
     
     -- Register Outputs
@@ -287,5 +271,7 @@ begin
      VGA_RED_O    <= vga_red_reg;
      VGA_GREEN_O  <= vga_green_reg;
      VGA_BLUE_O   <= vga_blue_reg;
+     H_CNT_O <= h_cntr_reg;
+     V_CNT_O <= v_cntr_reg;
 
 end Behavioral;

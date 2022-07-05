@@ -97,8 +97,13 @@ component vga_ctrl
            VGA_RED_O : out STD_LOGIC_VECTOR (3 downto 0);
            VGA_BLUE_O : out STD_LOGIC_VECTOR (3 downto 0);
            VGA_GREEN_O : out STD_LOGIC_VECTOR (3 downto 0);
-           PS2_CLK      : inout STD_LOGIC;
-           PS2_DATA     : inout STD_LOGIC
+
+           VGA_RED_I   : in STD_LOGIC_VECTOR (3 downto 0);
+           VGA_GREEN_I : in STD_LOGIC_VECTOR (3 downto 0);
+           VGA_BLUE_I  : in STD_LOGIC_VECTOR (3 downto 0);
+           
+           H_CNT_O     : out STD_LOGIC_VECTOR (11 downto 0);
+           V_CNT_O     : out STD_LOGIC_VECTOR (11 downto 0)
            );
 end component;
 
@@ -469,8 +474,13 @@ Inst_vga_ctrl: vga_ctrl port map(
 		VGA_RED_O => VGA_RED,
         VGA_BLUE_O => VGA_BLUE,
         VGA_GREEN_O => VGA_GREEN,
-        PS2_CLK => PS2_CLK,
-        PS2_DATA => PS2_DATA
+
+        H_CNT_O => open,
+        V_CNT_O => open,
+
+		VGA_RED_I =>   "0010" ,
+        VGA_GREEN_I => "1000",
+        VGA_BLUE_I =>  "0010"
 	);
 
 end Behavioral;
